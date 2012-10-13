@@ -4,6 +4,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_year">YearActivity</string>
 
+    <!-- Button strings -->
+    <string name="button_cancel">Button</string>
+    <string name="button_set">Set</string>
+
     <!-- Menu item strings -->
     <string name="menu_settings">Settings</string>
     <string name="menu_add_year">Add Year</string>
@@ -13,5 +17,33 @@
     <!-- Tags for the fragments. No need for translations -->
     <string name="fragment_tag_year">year_fragment</string>
     <string name="fragment_tag_month">month_fragment</string>
+    <string name="dateSliderTitle">Selected date</string>
+
+    <!-- Months, full -->
+    <string name="month_jan_full">January</string>
+    <string name="month_feb_full">February</string>
+    <string name="month_mar_full">March</string>
+    <string name="month_apr_full">April</string>
+    <string name="month_may_full">May</string>
+    <string name="month_jun_full">June</string>
+    <string name="month_jul_full">July</string>
+    <string name="month_aug_full">August</string>
+    <string name="month_sep_full">September</string>
+    <string name="month_oct_full">October</string>
+    <string name="month_nov_full">November</string>
+    <string name="month_dec_full">December</string>
+    <!-- Months, abbrev -->
+    <string name="month_jan">Jan</string>
+    <string name="month_feb">Feb</string>
+    <string name="month_mar">Mar</string>
+    <string name="month_apr">Apr</string>
+    <string name="month_may">May</string>
+    <string name="month_jun">Jun</string>
+    <string name="month_jul">Jul</string>
+    <string name="month_aug">Aug</string>
+    <string name="month_sep">Sep</string>
+    <string name="month_oct">Oct</string>
+    <string name="month_nov">Nov</string>
+    <string name="month_dec">Dec</string>
 
 </resources>

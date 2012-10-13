@@ -1,6 +1,5 @@
 package com.asa.expensetracker.ui;
 
-import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,7 +8,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.Button;
 
 import com.asa.expensetracker.R;
 
@@ -27,6 +26,14 @@ public class YearFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.year_fragment, null);
+		Button button = (Button) v.findViewById(R.id.button1);
+		button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				NumberPickerFragment frag = NumberPickerFragment.newInstance();
+				frag.show(getFragmentManager(), "tag");
+			}
+		});
 		return v;
 	}
 
