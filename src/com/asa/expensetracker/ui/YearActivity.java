@@ -34,8 +34,6 @@ public class YearActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setProgressBarIndeterminateVisibility(true);
 		setContentView(R.layout.activity_year);
 		ParseUser user = ParseUser.getCurrentUser();
 		if (user == null) {
@@ -45,13 +43,20 @@ public class YearActivity extends Activity {
 			user.setPassword("asdf");
 			user.signUpInBackground(new SignUpCallback() {
 				@Override
-				public void done(ParseException arg0) {
+				public void done(ParseException e) {
+					if (e == null) {
+						ParseUser user = ParseUser.getCurrentUser();
+						StorageUtils.setUserId(user.getObjectId(),
+								getApplicationContext());
+					} else {
+						ParseUtils.parseExceptionOccurred(e,
+								getApplicationContext());
+					}
 
 				}
 			});
 		} else {
-			StorageUtils.setUserId(user.getString(ParseUtils.COLUMN_OBJECT_ID),
-					this);
+			StorageUtils.setUserId(user.getObjectId(), this);
 		}
 		fm = getFragmentManager();
 		Fragment fragment = YearFragment.newInstance();

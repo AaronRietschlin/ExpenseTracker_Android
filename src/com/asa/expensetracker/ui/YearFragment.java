@@ -14,6 +14,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 import com.asa.expensetracker.R;
 import com.asa.expensetracker.ui.YearActivity.RefreshButtonClickListener;
 import com.asa.expensetracker.utils.ParseUtils;
+import com.asa.expensetracker.utils.StorageUtils;
 import com.googlecode.android.widgets.DateSlider.DateSlider;
 import com.googlecode.android.widgets.DateSlider.DateSlider.OnDateSetListener;
 import com.parse.FindCallback;
@@ -73,8 +76,20 @@ public class YearFragment extends ListFragment {
 		mAdapter = new YearAdapter(mActivity, null);
 		mList.setAdapter(mAdapter);
 		getYears();
+		mList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				ParseObject yearObject = mAdapter.getItem(position);
+				moveOn(yearObject);
+			}
+		});
 	}
 
+	/**
+	 * Retrieves the years from the Parse server. It first removes them if any
+	 * are present.
+	 */
 	private void getYears() {
 		// Remove them all if there is already stuff in it.
 		if (mAdapter.getCount() > 0) {
@@ -151,11 +166,6 @@ public class YearFragment extends ListFragment {
 					});
 				}
 
-				private void moveOn(ParseObject yearObject) {
-					mActivity.setRefreshActionButtonState(false);
-					mActivity.setYearParseObject(yearObject);
-				}
-
 				/**
 				 * Saves the year to the {@link ParseUtils#TABLE_YEAR} table. If
 				 * an error occurs, it informs the user. Otherwise, it moves on
@@ -163,8 +173,11 @@ public class YearFragment extends ListFragment {
 				 */
 				private void save() {
 					// Create a new object in the Parse database
-					ParseObject newYear = new ParseObject(ParseUtils.TABLE_YEAR);
+					final ParseObject newYear = new ParseObject(
+							ParseUtils.TABLE_YEAR);
 					newYear.put(ParseUtils.COLUMN_NAME, yearString);
+					newYear.put(ParseUtils.COLUMN_USER_ID,
+							StorageUtils.getUserId(mActivity));
 					newYear.saveInBackground(new SaveCallback() {
 						@Override
 						public void done(ParseException e) {
@@ -172,6 +185,8 @@ public class YearFragment extends ListFragment {
 								// It saved.
 								Toast.makeText(mActivity, "Saved!",
 										Toast.LENGTH_SHORT).show();
+								mAdapter.addItem(newYear);
+								moveOn(newYear);
 							} else {
 								ParseUtils.parseExceptionOccurred(e, mActivity);
 								mActivity.setRefreshActionButtonState(false);
@@ -184,6 +199,11 @@ public class YearFragment extends ListFragment {
 			return true;
 		}
 		return false;
+	}
+
+	private void moveOn(ParseObject yearObject) {
+		mActivity.setRefreshActionButtonState(false);
+		mActivity.setYearParseObject(yearObject);
 	}
 
 	static class ViewHolder {
@@ -239,6 +259,16 @@ public class YearFragment extends ListFragment {
 		public void removeAllItems() {
 			items.removeAll(items);
 			notifyDataSetChanged();
+		}
+
+		public void addItem(ParseObject item) {
+			items.add(item);
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public ParseObject getItem(int position) {
+			return items.get(position);
 		}
 
 	}
