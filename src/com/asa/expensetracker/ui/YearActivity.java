@@ -21,6 +21,11 @@ public class YearActivity extends Activity {
 	private FragmentManager fm;
 	private int enterAnimationId, exitAnimationId;
 	private Menu mOptionsMenu;
+	private RefreshButtonClickListener refreshButtonClickListener;
+
+	public interface RefreshButtonClickListener {
+		abstract void refreshButtonClicked();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +69,10 @@ public class YearActivity extends Activity {
 		case R.id.menu_settings:
 			break;
 		case R.id.menu_refresh:
-			setRefreshActionButtonState(true);
+			if (refreshButtonClickListener != null) {
+				refreshButtonClickListener.refreshButtonClicked();
+				setRefreshActionButtonState(true);
+			}
 			break;
 		}
 		Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
@@ -218,5 +226,14 @@ public class YearActivity extends Activity {
 
 	public void popBackStack() {
 		fm.popBackStack();
+	}
+
+	public RefreshButtonClickListener getRefreshButtonClickListener() {
+		return refreshButtonClickListener;
+	}
+
+	public void setRefreshButtonClickListener(
+			RefreshButtonClickListener refreshButtonClickListener) {
+		this.refreshButtonClickListener = refreshButtonClickListener;
 	}
 }
