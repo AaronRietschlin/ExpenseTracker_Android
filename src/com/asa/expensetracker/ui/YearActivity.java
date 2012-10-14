@@ -13,6 +13,7 @@ import com.asa.expensetracker.R;
 import com.asa.expensetracker.utils.ParseUtils;
 import com.asa.expensetracker.utils.StorageUtils;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
@@ -21,6 +22,9 @@ public class YearActivity extends Activity {
 	private FragmentManager fm;
 	private int enterAnimationId, exitAnimationId;
 	private Menu mOptionsMenu;
+
+	private ParseObject yearParseObject;
+
 	private RefreshButtonClickListener refreshButtonClickListener;
 
 	public interface RefreshButtonClickListener {
@@ -235,5 +239,13 @@ public class YearActivity extends Activity {
 	public void setRefreshButtonClickListener(
 			RefreshButtonClickListener refreshButtonClickListener) {
 		this.refreshButtonClickListener = refreshButtonClickListener;
+	}
+
+	public ParseObject getYearParseObject() {
+		return yearParseObject;
+	}
+
+	public void setYearParseObject(ParseObject yearParseObject) {
+		this.yearParseObject = yearParseObject;
 	}
 }
