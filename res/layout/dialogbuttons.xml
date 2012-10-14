@@ -6,7 +6,7 @@
     android:orientation="horizontal" >
 
     <Button
-        android:id="@+id/dateSliderCancelButton"
+        android:id="@+id/button_cancel"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_weight="1"
@@ -14,7 +14,7 @@
         android:text="@string/button_cancel" />
 
     <Button
-        android:id="@+id/dateSliderOkButton"
+        android:id="@+id/button_set"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_weight="1"

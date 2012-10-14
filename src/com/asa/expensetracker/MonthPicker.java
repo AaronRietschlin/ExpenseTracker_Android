@@ -19,10 +19,15 @@ public class MonthPicker extends NumberPicker {
 		build(context);
 	}
 
+	public MonthPicker(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		build(context);
+	}
+
 	private void build(Context context) {
 		LayoutInflater inflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		addView(inflater.inflate(R.layout.month_picker, null, false));
+		addView(inflater.inflate(R.layout.month_picker, this, false));
 		mContext = context;
 		String[] monthsAbbreviated = mContext.getResources().getStringArray(
 				R.array.months_abrev);

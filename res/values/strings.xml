@@ -5,7 +5,7 @@
     <string name="title_activity_year">YearActivity</string>
 
     <!-- Button strings -->
-    <string name="button_cancel">Button</string>
+    <string name="button_cancel">Cancel</string>
     <string name="button_set">Set</string>
 
     <!-- Menu item strings -->
