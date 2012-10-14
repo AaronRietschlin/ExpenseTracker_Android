@@ -38,5 +38,9 @@ public class ParseUtils {
 	 */
 	public static final String COLUMN_EXPENSE_VALID = "expense_valid";
 	public static final String COLUMN_OBJECT_ID = "objectId";
+	/**
+	 * The name of the object (used in year and month tables).
+	 */
+	public static final String COLUMN_NAME = "name";
 
 }

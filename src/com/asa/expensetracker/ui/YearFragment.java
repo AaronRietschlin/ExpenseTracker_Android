@@ -1,5 +1,6 @@
 package com.asa.expensetracker.ui;
 
+import java.text.DateFormatSymbols;
 import java.util.Calendar;
 
 import android.app.Fragment;
@@ -13,8 +14,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.asa.expensetracker.R;
+import com.asa.expensetracker.utils.ParseUtils;
 import com.googlecode.android.widgets.DateSlider.DateSlider;
 import com.googlecode.android.widgets.DateSlider.DateSlider.OnDateSetListener;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 public class YearFragment extends Fragment {
 
@@ -42,6 +47,28 @@ public class YearFragment extends Fragment {
 				frag.setDateSetListener(new OnDateSetListener() {
 					@Override
 					public void onDateSet(DateSlider view, Calendar selectedDate) {
+						// Get the month text.
+						DateFormatSymbols dfs = new DateFormatSymbols();
+						String monthText = dfs.getMonths()[selectedDate
+								.get(Calendar.MONTH)];
+						// Get the current year.
+						Calendar cal = Calendar.getInstance();
+						int year = cal.get(Calendar.YEAR);
+						// Create a new object in the Parse database
+						ParseObject newYear = new ParseObject(
+								ParseUtils.TABLE_YEAR);
+						newYear.put(ParseUtils.COLUMN_NAME, year);
+						newYear.saveInBackground(new SaveCallback() {
+
+							@Override
+							public void done(ParseException e) {
+								if(e == null){
+									// It saved.
+								}else{
+									// It failed.
+								}
+							}
+						});
 
 					}
 				});

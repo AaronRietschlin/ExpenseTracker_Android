@@ -20,10 +20,13 @@ public class YearActivity extends Activity {
 
 	private FragmentManager fm;
 	private int enterAnimationId, exitAnimationId;
+	private Menu mOptionsMenu;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setProgressBarIndeterminateVisibility(true);
 		setContentView(R.layout.activity_year);
 		ParseUser user = ParseUser.getCurrentUser();
 		if (user == null) {
@@ -51,6 +54,7 @@ public class YearActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_year, menu);
+		mOptionsMenu = menu;
 		return true;
 	}
 
@@ -59,9 +63,32 @@ public class YearActivity extends Activity {
 		switch (item.getItemId()) {
 		case R.id.menu_settings:
 			break;
+		case R.id.menu_refresh:
+			setRefreshActionButtonState(true);
+			break;
 		}
 		Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
 		return false;
+	}
+
+	/**
+	 * Sets the Refresh menu item Action View to an indeterminate progress bar.
+	 * 
+	 * @param refreshing
+	 */
+	public void setRefreshActionButtonState(boolean refreshing) {
+		if (mOptionsMenu == null) {
+			return;
+		}
+		final MenuItem refreshItem = mOptionsMenu.findItem(R.id.menu_refresh);
+		if (refreshItem != null) {
+			if (refreshing) {
+				refreshItem
+						.setActionView(R.layout.actionbar_indeterminate_progress);
+			} else {
+				refreshItem.setActionView(null);
+			}
+		}
 	}
 
 	/**
