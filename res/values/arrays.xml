@@ -1,33 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <string-array name="months_full">
-        <item>@string/month_jan_full</item>
-        <item>@string/month_feb_full</item>
-        <item>@string/month_mar_full</item>
-        <item>@string/month_apr_full</item>
-        <item>@string/month_may_full</item>
-        <item>@string/month_jun_full</item>
-        <item>@string/month_jul_full</item>
-        <item>@string/month_aug_full</item>
-        <item>@string/month_sep_full</item>
-        <item>@string/month_oct_full</item>
-        <item>@string/month_nov_full</item>
-        <item>@string/month_dec_full</item>
-    </string-array>
-    <string-array name="months_abrev">
-        <item>@string/month_jan</item>
-        <item>@string/month_feb</item>
-        <item>@string/month_mar</item>
-        <item>@string/month_apr</item>
-        <item>@string/month_may</item>
-        <item>@string/month_jun</item>
-        <item>@string/month_jul</item>
-        <item>@string/month_aug</item>
-        <item>@string/month_sep</item>
-        <item>@string/month_oct</item>
-        <item>@string/month_nov</item>
-        <item>@string/month_dec</item>
-    </string-array>
 
 </resources>

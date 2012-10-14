@@ -1,5 +1,7 @@
 package com.asa.expensetracker.ui;
 
+import java.util.Calendar;
+
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,8 +13,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.asa.expensetracker.R;
+import com.googlecode.android.widgets.DateSlider.DateSlider;
+import com.googlecode.android.widgets.DateSlider.DateSlider.OnDateSetListener;
 
 public class YearFragment extends Fragment {
+
+	public static YearFragment newInstance() {
+		return new YearFragment();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +39,12 @@ public class YearFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				NumberPickerFragment frag = NumberPickerFragment.newInstance();
+				frag.setDateSetListener(new OnDateSetListener() {
+					@Override
+					public void onDateSet(DateSlider view, Calendar selectedDate) {
+
+					}
+				});
 				frag.show(getFragmentManager(), "tag");
 			}
 		});

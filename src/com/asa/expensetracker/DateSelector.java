@@ -12,8 +12,13 @@ public class DateSelector extends DateSlider {
 	public static final int TYPE_YEAR = 16;
 
 	public DateSelector(Context context, OnDateSetListener l,
-			Calendar initialTime, int type) {
+			Calendar initialTime) {
 		super(context, R.layout.month_dateslider, l, initialTime);
+		setTitle(R.string.set_month);
 	}
 
+	@Override
+	public void setTitle() {
+		mTitleText.setText(R.string.set_month);
+	}
 }
