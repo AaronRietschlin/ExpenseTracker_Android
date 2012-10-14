@@ -1,6 +1,5 @@
 package com.asa.expensetracker.ui;
 
-import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -22,16 +21,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.asa.expensetracker.R;
+import com.asa.expensetracker.ui.AddMonthDialogFragment.MonthAddedListener;
 import com.asa.expensetracker.ui.YearActivity.RefreshButtonClickListener;
 import com.asa.expensetracker.utils.ParseUtils;
 import com.asa.expensetracker.utils.StorageUtils;
-import com.googlecode.android.widgets.DateSlider.DateSlider;
-import com.googlecode.android.widgets.DateSlider.DateSlider.OnDateSetListener;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 public class YearFragment extends ListFragment {
@@ -95,21 +95,20 @@ public class YearFragment extends ListFragment {
 		if (mAdapter.getCount() > 0) {
 			mAdapter.removeAllItems();
 		}
-		ParseQuery query = new ParseQuery(ParseUtils.TABLE_YEAR);
-		mActivity.setRefreshActionButtonState(true);
-		query.findInBackground(new FindCallback() {
+		ParseUser.getCurrentUser().getRelation("year").getQuery()
+				.findInBackground(new FindCallback() {
 
-			@Override
-			public void done(List<ParseObject> items, ParseException e) {
-				if (e == null) {
-					// Retrieved the list.
-					mAdapter.setItems(items);
-				} else {
-					ParseUtils.parseExceptionOccurred(e, mActivity);
-				}
-				mActivity.setRefreshActionButtonState(false);
-			}
-		});
+					@Override
+					public void done(List<ParseObject> items, ParseException e) {
+						if (e == null) {
+							// Retrieved the list.
+							mAdapter.setItems(items);
+						} else {
+							ParseUtils.parseExceptionOccurred(e, mActivity);
+						}
+						mActivity.setRefreshActionButtonState(false);
+					}
+				});
 	}
 
 	@Override
@@ -121,22 +120,19 @@ public class YearFragment extends ListFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_add_year:
-			NumberPickerFragment frag = NumberPickerFragment.newInstance();
-			frag.setDateSetListener(new OnDateSetListener() {
-
-				private String yearString, monthText;
+			AddMonthDialogFragment frag = new AddMonthDialogFragment();
+			frag.setMonthAddedListener(new MonthAddedListener() {
+				private String yearString, mMonth, mExpense;
 
 				@Override
-				public void onDateSet(DateSlider view, Calendar selectedDate) {
+				public void monthAdded(String month, String expense) {
 					mActivity.setRefreshActionButtonState(true);
-					// Get the month text.
-					DateFormatSymbols dfs = new DateFormatSymbols();
-					monthText = dfs.getMonths()[selectedDate
-							.get(Calendar.MONTH)];
 					// Get the current year.
 					Calendar cal = Calendar.getInstance();
 					int year = cal.get(Calendar.YEAR);
 					yearString = String.valueOf(year);
+					mMonth = month;
+					mExpense = expense;
 
 					// Check to see if this year is already saved.
 					ParseQuery query = new ParseQuery(ParseUtils.TABLE_YEAR);
@@ -172,30 +168,61 @@ public class YearFragment extends ListFragment {
 				 * to the next fragment, passing the month on.
 				 */
 				private void save() {
-					// Create a new object in the Parse database
+					// Create a new year and month in the Parse database
 					final ParseObject newYear = new ParseObject(
 							ParseUtils.TABLE_YEAR);
 					newYear.put(ParseUtils.COLUMN_NAME, yearString);
 					newYear.put(ParseUtils.COLUMN_USER_ID,
 							StorageUtils.getUserId(mActivity));
-					newYear.saveInBackground(new SaveCallback() {
-						@Override
-						public void done(ParseException e) {
-							if (e == null) {
-								// It saved.
-								Toast.makeText(mActivity, "Saved!",
-										Toast.LENGTH_SHORT).show();
-								mAdapter.addItem(newYear);
-								moveOn(newYear);
-							} else {
-								ParseUtils.parseExceptionOccurred(e, mActivity);
-								mActivity.setRefreshActionButtonState(false);
-							}
-						}
-					});
+					final ParseObject newMonth = new ParseObject(
+							ParseUtils.TABLE_MONTH);
+					newMonth.put(ParseUtils.COLUMN_NAME, mMonth);
+					newMonth.put(ParseUtils.COLUMN_EXPENSE,
+							Double.valueOf(mExpense));
+					// newYear.saveInBackground(new SaveCallback() {
+					// @Override
+					// public void done(ParseException e) {
+					// if (e == null) {
+					// // It saved.
+					// Toast.makeText(mActivity, "Saved!",
+					// Toast.LENGTH_SHORT).show();
+					// mAdapter.addItem(newYear);
+					// moveOn(newYear);
+					// } else {
+					// ParseUtils.parseExceptionOccurred(e, mActivity);
+					// mActivity.setRefreshActionButtonState(false);
+					// }
+					// }
+					// });
+					List<ParseObject> objList = new ArrayList<ParseObject>();
+					objList.add(newYear);
+					objList.add(newMonth);
+					ParseObject.saveAllInBackground(objList,
+							new SaveCallback() {
+								@Override
+								public void done(ParseException e) {
+									if (e == null) {
+										ParseRelation relation = newYear
+												.getRelation("month");
+										relation.add(newMonth);
+										newYear.saveInBackground();
+										ParseUser user = ParseUser
+												.getCurrentUser();
+										user.getRelation("year").add(newYear);
+										user.saveInBackground();
+
+									} else {
+										ParseUtils.parseExceptionOccurred(e,
+												mActivity);
+									}
+									mActivity
+											.setRefreshActionButtonState(false);
+									mAdapter.addItem(newYear);
+								}
+							});
 				}
 			});
-			frag.show(getFragmentManager(), "tag");
+			frag.show(getFragmentManager(), "test");
 			return true;
 		}
 		return false;
@@ -204,6 +231,7 @@ public class YearFragment extends ListFragment {
 	private void moveOn(ParseObject yearObject) {
 		mActivity.setRefreshActionButtonState(false);
 		mActivity.setYearParseObject(yearObject);
+		mActivity.replaceFragment(new MonthFragment(), "", true);
 	}
 
 	static class ViewHolder {
@@ -243,7 +271,6 @@ public class YearFragment extends ListFragment {
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-
 			ParseObject yearObject = items.get(position);
 			String name = yearObject.getString(ParseUtils.COLUMN_NAME);
 			holder.name.setText(name);

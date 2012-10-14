@@ -131,15 +131,8 @@ public class YearActivity extends Activity {
 	 * @return
 	 */
 	private FragmentTransaction setAnimation(FragmentTransaction ft) {
-		if (exitAnimationId == 0) {
-			if (enterAnimationId == 0)
-				ft.setCustomAnimations(R.anim.slide_in_right,
-						R.anim.slide_out_left, R.anim.slide_in_left,
-						android.R.anim.slide_out_right);
-			else
-				ft.setCustomAnimations(enterAnimationId, enterAnimationId);
-		} else
-			ft.setCustomAnimations(enterAnimationId, exitAnimationId);
+//		ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
+//				R.anim.slide_in_left, android.R.anim.slide_out_right);
 		return ft;
 	}
 

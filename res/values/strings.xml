@@ -21,4 +21,22 @@
     <string name="dateSliderTitle">Selected date</string>
     <string name="set_month">Set Month</string>
 
+    <!-- Add Month strings -->
+    <string name="add_month_enter_amount">Enter your monthly income:</string>
+    <string name="add_month_select_month">Select a month:</string>
+
+    <!-- Months -->
+    <string name="month_jan">January</string>
+    <string name="month_feb">Febraury</string>
+    <string name="month_mar">March</string>
+    <string name="month_apr">April</string>
+    <string name="month_may">May</string>
+    <string name="month_jun">June</string>
+    <string name="month_jul">July</string>
+    <string name="month_aug">August</string>
+    <string name="month_sep">September</string>
+    <string name="month_oct">October</string>
+    <string name="month_nov">November</string>
+    <string name="month_dec">December</string>
+
 </resources>
