@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.app.ListFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,11 +13,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.asa.expensetracker.R;
 import com.asa.expensetracker.ui.AddMonthDialogFragment.MonthAddedListener;
+import com.asa.expensetracker.ui.YearActivity.RefreshButtonClickListener;
+import com.asa.expensetracker.ui.YearFragment.ViewHolder;
 import com.asa.expensetracker.utils.ParseUtils;
 import com.asa.expensetracker.utils.StorageUtils;
 import com.parse.FindCallback;
@@ -31,6 +36,7 @@ public class MonthFragment extends ListFragment {
 
 	private YearActivity mActivity;
 	private ParseObject yearObject;
+	private MonthAdapter mAdapter;
 	private ListView mList;
 
 	@Override
@@ -54,20 +60,34 @@ public class MonthFragment extends ListFragment {
 		mActivity = (YearActivity) getActivity();
 		mList = getListView();
 		yearObject = mActivity.getYearParseObject();
+		mActivity
+				.setRefreshButtonClickListener(new RefreshButtonClickListener() {
+					@Override
+					public void refreshButtonClicked() {
+						getMonths();
+					}
+				});
+
+		mAdapter = new MonthAdapter(mActivity, null);
+		mList.setAdapter(mAdapter);
+
+		// Retrieve the months
 		getMonths();
+
 	}
 
 	private void getMonths() {
+		mActivity.setRefreshActionButtonState(true);
 		ParseRelation relation = yearObject.getRelation("month");
 		relation.getQuery().findInBackground(new FindCallback() {
-
 			@Override
 			public void done(List<ParseObject> items, ParseException e) {
 				if (e == null) {
-					System.out.print(true);
+					mAdapter.setItems(items);
 				} else {
 					ParseUtils.parseExceptionOccurred(e, mActivity);
 				}
+				mActivity.setRefreshActionButtonState(false);
 			}
 		});
 		ParseQuery query = new ParseQuery(ParseUtils.TABLE_MONTH);
@@ -111,16 +131,16 @@ public class MonthFragment extends ListFragment {
 					mMonth = month;
 					mExpense = expense;
 
-					// Check to see if this year is already saved.
+					// Check to see if this month is already saved.
 					ParseQuery query = new ParseQuery(ParseUtils.TABLE_MONTH);
 					query.whereEqualTo(ParseUtils.COLUMN_NAME, mMonth);
 					query.getFirstInBackground(new GetCallback() {
 						@Override
 						public void done(ParseObject object, ParseException e) {
 							if (e == null) {
-								// This means this particular year was
+								// This means this particular month was
 								// already saved. Simply get the month with
-								// that ID and move on.
+								// that ID and move on. TODO!
 								Toast.makeText(mActivity,
 										"Found: " + object.getObjectId(),
 										Toast.LENGTH_SHORT).show();
@@ -156,21 +176,6 @@ public class MonthFragment extends ListFragment {
 					newMonth.put(ParseUtils.COLUMN_NAME, mMonth);
 					newMonth.put(ParseUtils.COLUMN_EXPENSE,
 							Double.valueOf(mExpense));
-					// newYear.saveInBackground(new SaveCallback() {
-					// @Override
-					// public void done(ParseException e) {
-					// if (e == null) {
-					// // It saved.
-					// Toast.makeText(mActivity, "Saved!",
-					// Toast.LENGTH_SHORT).show();
-					// mAdapter.addItem(newYear);
-					// moveOn(newYear);
-					// } else {
-					// ParseUtils.parseExceptionOccurred(e, mActivity);
-					// mActivity.setRefreshActionButtonState(false);
-					// }
-					// }
-					// });
 					List<ParseObject> objList = new ArrayList<ParseObject>();
 					objList.add(newYear);
 					objList.add(newMonth);
@@ -189,7 +194,6 @@ public class MonthFragment extends ListFragment {
 									}
 									mActivity
 											.setRefreshActionButtonState(false);
-									// mAdapter.add(newYear);
 								}
 							});
 				}
@@ -198,6 +202,66 @@ public class MonthFragment extends ListFragment {
 			return true;
 		}
 		return false;
+	}
+
+	private class MonthAdapter extends ArrayAdapter<ParseObject> {
+		private List<ParseObject> items;
+		private LayoutInflater inflater;
+
+		public MonthAdapter(Context context, List<ParseObject> objects) {
+			super(context, 0, objects);
+			if (objects == null) {
+				items = new ArrayList<ParseObject>();
+			} else {
+				items = objects;
+			}
+			inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+
+		@Override
+		public int getCount() {
+			return items.size();
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder = null;
+			if (convertView == null) {
+				convertView = inflater.inflate(R.layout.month_list_row, null);
+				holder = new ViewHolder();
+				holder.name = (TextView) convertView
+						.findViewById(R.id.month_row_name);
+				convertView.setTag(holder);
+			} else {
+				holder = (ViewHolder) convertView.getTag();
+			}
+			ParseObject monthObject = items.get(position);
+			String name = monthObject.getString(ParseUtils.COLUMN_NAME);
+			holder.name.setText(name);
+			return convertView;
+		}
+
+		public void setItems(List<ParseObject> objects) {
+			items.removeAll(items);
+			items.addAll(objects);
+			notifyDataSetChanged();
+		}
+
+		public void removeAllItems() {
+			items.removeAll(items);
+			notifyDataSetChanged();
+		}
+
+		public void addItem(ParseObject item) {
+			items.add(item);
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public ParseObject getItem(int position) {
+			return items.get(position);
+		}
 	}
 
 }

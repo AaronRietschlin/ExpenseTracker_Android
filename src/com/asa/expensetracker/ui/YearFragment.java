@@ -143,7 +143,7 @@ public class YearFragment extends ListFragment {
 							if (e == null) {
 								// This means this particular year was
 								// already saved. Simply get the month with
-								// that ID and move on.
+								// that ID and move on. TODO!
 								Toast.makeText(mActivity,
 										"Found: " + object.getObjectId(),
 										Toast.LENGTH_SHORT).show();
@@ -179,21 +179,8 @@ public class YearFragment extends ListFragment {
 					newMonth.put(ParseUtils.COLUMN_NAME, mMonth);
 					newMonth.put(ParseUtils.COLUMN_EXPENSE,
 							Double.valueOf(mExpense));
-					// newYear.saveInBackground(new SaveCallback() {
-					// @Override
-					// public void done(ParseException e) {
-					// if (e == null) {
-					// // It saved.
-					// Toast.makeText(mActivity, "Saved!",
-					// Toast.LENGTH_SHORT).show();
-					// mAdapter.addItem(newYear);
-					// moveOn(newYear);
-					// } else {
-					// ParseUtils.parseExceptionOccurred(e, mActivity);
-					// mActivity.setRefreshActionButtonState(false);
-					// }
-					// }
-					// });
+					// Add them to a list that will save them both at the same
+					// time.
 					List<ParseObject> objList = new ArrayList<ParseObject>();
 					objList.add(newYear);
 					objList.add(newMonth);
@@ -205,10 +192,14 @@ public class YearFragment extends ListFragment {
 										ParseRelation relation = newYear
 												.getRelation("month");
 										relation.add(newMonth);
+										// Save the month as a relation to this
+										// particular year TODO - Handle failure
 										newYear.saveInBackground();
 										ParseUser user = ParseUser
 												.getCurrentUser();
 										user.getRelation("year").add(newYear);
+										// Save this year to the user
+										// TODO - Handle failure
 										user.saveInBackground();
 
 									} else {
