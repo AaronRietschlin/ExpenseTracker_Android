@@ -19,4 +19,8 @@ public class BaseFragment extends Fragment {
 		mActivity.setCurrentFragment(this);
 	}
 
+	protected void setHomeUpEnabled(boolean enabled) {
+		mActivity.setHomeUpAsEnabled(enabled);
+	}
+
 }

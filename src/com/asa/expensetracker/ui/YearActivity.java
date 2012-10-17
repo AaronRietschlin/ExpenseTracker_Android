@@ -1,5 +1,6 @@
 package com.asa.expensetracker.ui;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -16,10 +17,13 @@ import com.parse.ParseUser;
 
 public class YearActivity extends Activity {
 
+	// TODO - move the login to it's own activity (to remove the top)
+
 	private FragmentManager fm;
 	private Fragment currentFragment;
 	private int enterAnimationId, exitAnimationId;
 	private Menu mOptionsMenu;
+	private ActionBar mActionBar;
 
 	private ParseObject yearParseObject;
 
@@ -34,6 +38,7 @@ public class YearActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_year);
 		fm = getFragmentManager();
+		mActionBar = getActionBar();
 
 		ParseUser user = ParseUser.getCurrentUser();
 		if (user == null) {
@@ -86,6 +91,11 @@ public class YearActivity extends Activity {
 			Intent intent = new Intent(this, YearActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
+			break;
+		case android.R.id.home:
+			if (fm.getBackStackEntryCount() > 0) {
+				fm.popBackStack();
+			}
 			break;
 		}
 		return false;
@@ -256,5 +266,9 @@ public class YearActivity extends Activity {
 
 	public void setCurrentFragment(Fragment currentFragment) {
 		this.currentFragment = currentFragment;
+	}
+
+	public void setHomeUpAsEnabled(boolean enabled) {
+		mActionBar.setDisplayHomeAsUpEnabled(enabled);
 	}
 }

@@ -73,6 +73,12 @@ public class MonthFragment extends BaseFragment {
 
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		setHomeUpEnabled(true);
+	}
+
 	private void getMonths() {
 		mActivity.setRefreshActionButtonState(true);
 		ParseRelation relation = yearObject.getRelation("month");
@@ -117,9 +123,10 @@ public class MonthFragment extends BaseFragment {
 			AddMonthDialogFragment frag = new AddMonthDialogFragment();
 			frag.setMonthAddedListener(new MonthAddedListener() {
 				private String yearString, mMonth, mExpense;
+				private int mMonthId;
 
 				@Override
-				public void monthAdded(String month, String expense) {
+				public void monthAdded(String month, String expense, int monthId) {
 					mActivity.setRefreshActionButtonState(true);
 					// Get the current year.
 					Calendar cal = Calendar.getInstance();
@@ -127,6 +134,7 @@ public class MonthFragment extends BaseFragment {
 					yearString = String.valueOf(year);
 					mMonth = month;
 					mExpense = expense;
+					mMonthId = monthId;
 
 					ParseRelation relation = yearObject.getRelation("month");
 					ParseQuery query = relation.getQuery();
@@ -170,6 +178,7 @@ public class MonthFragment extends BaseFragment {
 					newMonth.put(ParseUtils.COLUMN_NAME, mMonth);
 					newMonth.put(ParseUtils.COLUMN_EXPENSE,
 							Double.valueOf(mExpense));
+					newMonth.put(ParseUtils.COLUMN_MONTH_ID, mMonthId);
 					newMonth.saveInBackground(new SaveCallback() {
 						@Override
 						public void done(ParseException e) {

@@ -82,6 +82,12 @@ public class YearFragment extends BaseFragment {
 		});
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		setHomeUpEnabled(false);
+	}
+
 	/**
 	 * Retrieves the years from the Parse server. It first removes them if any
 	 * are present.
@@ -92,6 +98,7 @@ public class YearFragment extends BaseFragment {
 			mAdapter.removeAllItems();
 		}
 		ParseUser.getCurrentUser().getRelation("year").getQuery()
+				.orderByAscending(ParseUtils.COLUMN_MONTH_ID)
 				.findInBackground(new FindCallback() {
 
 					@Override
@@ -121,7 +128,7 @@ public class YearFragment extends BaseFragment {
 				private String yearString, mMonth, mExpense;
 
 				@Override
-				public void monthAdded(String month, String expense) {
+				public void monthAdded(String month, String expense, int monthId) {
 					mActivity.setRefreshActionButtonState(true);
 					// Get the current year.
 					Calendar cal = Calendar.getInstance();

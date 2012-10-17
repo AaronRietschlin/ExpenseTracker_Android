@@ -33,7 +33,7 @@ public class AddMonthDialogFragment extends DialogFragment {
 	};
 
 	public interface MonthAddedListener {
-		abstract void monthAdded(String month, String expense);
+		abstract void monthAdded(String month, String expense, int monthId);
 	}
 
 	@Override
@@ -58,11 +58,12 @@ public class AddMonthDialogFragment extends DialogFragment {
 		positiveButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				int monthId = spinner.getSelectedItemPosition();
 				String month = (String) spinner.getSelectedItem();
 				String expense = editText.getText().toString().trim();
 				if (expense == null || expense.length() == 0)
 					expense = "0.0";
-				monthAddedListener.monthAdded(month, expense);
+				monthAddedListener.monthAdded(month, expense, monthId);
 				dismiss();
 			}
 		});
