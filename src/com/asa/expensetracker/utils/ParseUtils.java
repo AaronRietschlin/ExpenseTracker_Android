@@ -55,6 +55,7 @@ public class ParseUtils {
 
 	public static final int ERROR_CODE_FAILURE = 100;
 	public static final int ERROR_CODE_NOT_FOUND = 101;
+	public static final int ERROR_USERNAME_TAKEN = 202;
 
 	/**
 	 * Checks the exception and gives the proper message. If true is returned,

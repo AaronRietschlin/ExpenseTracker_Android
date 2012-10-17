@@ -4,22 +4,20 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.asa.expensetracker.R;
-import com.asa.expensetracker.utils.ParseUtils;
 import com.asa.expensetracker.utils.StorageUtils;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 
 public class YearActivity extends Activity {
 
 	private FragmentManager fm;
+	private Fragment currentFragment;
 	private int enterAnimationId, exitAnimationId;
 	private Menu mOptionsMenu;
 
@@ -35,34 +33,33 @@ public class YearActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_year);
+		fm = getFragmentManager();
+
 		ParseUser user = ParseUser.getCurrentUser();
 		if (user == null) {
-			user = new ParseUser();
-			user.setUsername("nemisis.82@gmail.com");
-			user.setEmail("nemisis.82@gmail.com");
-			user.setPassword("asdf");
-			user.signUpInBackground(new SignUpCallback() {
-				@Override
-				public void done(ParseException e) {
-					if (e == null) {
-						ParseUser user = ParseUser.getCurrentUser();
-						StorageUtils.setUserId(user.getObjectId(),
-								getApplicationContext());
-					} else {
-						ParseUtils.parseExceptionOccurred(e,
-								getApplicationContext());
-					}
-
-				}
-			});
+			showLoginFragment();
 		} else {
+			showYearFragment();
 			StorageUtils.setUserId(user.getObjectId(), this);
 		}
-		fm = getFragmentManager();
+	}
+
+	private void showYearFragment() {
 		Fragment fragment = YearFragment.newInstance();
 		fm.beginTransaction()
 				.add(R.id.fragment_container, fragment,
 						getString(R.string.fragment_tag_year)).commit();
+	}
+
+	private void showLoginFragment() {
+		Fragment fragment = LoginFragment.newInstance();
+		FragmentTransaction transaction = fm.beginTransaction();
+		if (currentFragment != null) {
+			transaction.remove(currentFragment);
+		}
+		transaction.add(R.id.fragment_container, fragment,
+				getString(R.string.fragment_tag_year));
+		transaction.commit();
 	}
 
 	@Override
@@ -83,8 +80,14 @@ public class YearActivity extends Activity {
 				setRefreshActionButtonState(true);
 			}
 			break;
+		case R.id.menu_logout:
+			// TODO - Handle logout correctly
+			ParseUser.logOut();
+			Intent intent = new Intent(this, YearActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			break;
 		}
-		Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
 		return false;
 	}
 
@@ -131,8 +134,8 @@ public class YearActivity extends Activity {
 	 * @return
 	 */
 	private FragmentTransaction setAnimation(FragmentTransaction ft) {
-//		ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
-//				R.anim.slide_in_left, android.R.anim.slide_out_right);
+		// ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
+		// R.anim.slide_in_left, android.R.anim.slide_out_right);
 		return ft;
 	}
 
@@ -245,5 +248,13 @@ public class YearActivity extends Activity {
 
 	public void setYearParseObject(ParseObject yearParseObject) {
 		this.yearParseObject = yearParseObject;
+	}
+
+	public Fragment getCurrentFragment() {
+		return currentFragment;
+	}
+
+	public void setCurrentFragment(Fragment currentFragment) {
+		this.currentFragment = currentFragment;
 	}
 }

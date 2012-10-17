@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -32,9 +31,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.SaveCallback;
 
-public class MonthFragment extends ListFragment {
+public class MonthFragment extends BaseFragment {
 
-	private YearActivity mActivity;
 	private ParseObject yearObject;
 	private MonthAdapter mAdapter;
 	private ListView mList;
@@ -51,14 +49,13 @@ public class MonthFragment extends ListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.year_fragment, null);
+		mList = (ListView) v.findViewById(android.R.id.list);
 		return v;
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		mActivity = (YearActivity) getActivity();
-		mList = getListView();
 		yearObject = mActivity.getYearParseObject();
 		mActivity
 				.setRefreshButtonClickListener(new RefreshButtonClickListener() {
@@ -131,8 +128,8 @@ public class MonthFragment extends ListFragment {
 					mMonth = month;
 					mExpense = expense;
 
-					// Check to see if this month is already saved.
-					ParseQuery query = new ParseQuery(ParseUtils.TABLE_MONTH);
+					ParseRelation relation = yearObject.getRelation("month");
+					ParseQuery query = relation.getQuery();
 					query.whereEqualTo(ParseUtils.COLUMN_NAME, mMonth);
 					query.getFirstInBackground(new GetCallback() {
 						@Override
@@ -155,47 +152,38 @@ public class MonthFragment extends ListFragment {
 									save();
 								}
 							}
+							mActivity.setRefreshActionButtonState(false);
 						}
 					});
 				}
 
 				/**
-				 * Saves the year to the {@link ParseUtils#TABLE_YEAR} table. If
-				 * an error occurs, it informs the user. Otherwise, it moves on
-				 * to the next fragment, passing the month on.
+				 * Saves the year to the {@link ParseUtils#TABLE_MONTH} table.
+				 * If an error occurs, it informs the user. Otherwise, it moves
+				 * on to the next fragment, passing the month on.
 				 */
 				private void save() {
+					// Create a new month and store it to the current year
 					// Create a new year and month in the Parse database
-					final ParseObject newYear = new ParseObject(
-							ParseUtils.TABLE_YEAR);
-					newYear.put(ParseUtils.COLUMN_NAME, yearString);
-					newYear.put(ParseUtils.COLUMN_USER_ID,
-							StorageUtils.getUserId(mActivity));
 					final ParseObject newMonth = new ParseObject(
 							ParseUtils.TABLE_MONTH);
 					newMonth.put(ParseUtils.COLUMN_NAME, mMonth);
 					newMonth.put(ParseUtils.COLUMN_EXPENSE,
 							Double.valueOf(mExpense));
-					List<ParseObject> objList = new ArrayList<ParseObject>();
-					objList.add(newYear);
-					objList.add(newMonth);
-					ParseObject.saveAllInBackground(objList,
-							new SaveCallback() {
-								@Override
-								public void done(ParseException e) {
-									if (e == null) {
-										ParseRelation relation = newYear
-												.getRelation("month");
-										relation.add(newMonth);
-										newYear.saveInBackground();
-									} else {
-										ParseUtils.parseExceptionOccurred(e,
-												mActivity);
-									}
-									mActivity
-											.setRefreshActionButtonState(false);
-								}
-							});
+					newMonth.saveInBackground(new SaveCallback() {
+						@Override
+						public void done(ParseException e) {
+							if (e == null) {
+								ParseRelation relation = yearObject
+										.getRelation("month");
+								relation.add(newMonth);
+								// TODO - Add callback
+								yearObject.saveInBackground();
+							} else {
+								ParseUtils.parseExceptionOccurred(e, mActivity);
+							}
+						}
+					});
 				}
 			});
 			frag.show(getFragmentManager(), "test");

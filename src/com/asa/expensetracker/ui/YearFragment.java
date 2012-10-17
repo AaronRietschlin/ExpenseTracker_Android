@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,10 +33,9 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-public class YearFragment extends ListFragment {
+public class YearFragment extends BaseFragment {
 	private final static String TAG = "YearFragment";
 
-	private YearActivity mActivity;
 	private YearAdapter mAdapter;
 	private ListView mList;
 
@@ -57,14 +55,13 @@ public class YearFragment extends ListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.year_fragment, null);
-
+		mList = (ListView) v.findViewById(android.R.id.list);
 		return v;
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		mActivity = (YearActivity) getActivity();
 		mActivity
 				.setRefreshButtonClickListener(new RefreshButtonClickListener() {
 					@Override
@@ -72,7 +69,6 @@ public class YearFragment extends ListFragment {
 						getYears();
 					}
 				});
-		mList = getListView();
 		mAdapter = new YearAdapter(mActivity, null);
 		mList.setAdapter(mAdapter);
 		getYears();
@@ -135,7 +131,9 @@ public class YearFragment extends ListFragment {
 					mExpense = expense;
 
 					// Check to see if this year is already saved.
-					ParseQuery query = new ParseQuery(ParseUtils.TABLE_YEAR);
+					ParseRelation relation = ParseUser.getCurrentUser()
+							.getRelation("year");
+					ParseQuery query = relation.getQuery();
 					query.whereEqualTo(ParseUtils.COLUMN_NAME, yearString);
 					query.getFirstInBackground(new GetCallback() {
 						@Override

@@ -60,6 +60,8 @@ public class AddMonthDialogFragment extends DialogFragment {
 			public void onClick(View v) {
 				String month = (String) spinner.getSelectedItem();
 				String expense = editText.getText().toString().trim();
+				if (expense == null || expense.length() == 0)
+					expense = "0.0";
 				monthAddedListener.monthAdded(month, expense);
 				dismiss();
 			}
