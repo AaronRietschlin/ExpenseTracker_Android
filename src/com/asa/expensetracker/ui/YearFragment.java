@@ -98,7 +98,6 @@ public class YearFragment extends BaseFragment {
 			mAdapter.removeAllItems();
 		}
 		ParseUser.getCurrentUser().getRelation("year").getQuery()
-				.orderByAscending(ParseUtils.COLUMN_MONTH_ID)
 				.findInBackground(new FindCallback() {
 
 					@Override

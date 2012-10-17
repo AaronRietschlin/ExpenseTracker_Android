@@ -82,33 +82,18 @@ public class MonthFragment extends BaseFragment {
 	private void getMonths() {
 		mActivity.setRefreshActionButtonState(true);
 		ParseRelation relation = yearObject.getRelation("month");
-		relation.getQuery().findInBackground(new FindCallback() {
-			@Override
-			public void done(List<ParseObject> items, ParseException e) {
-				if (e == null) {
-					mAdapter.setItems(items);
-				} else {
-					ParseUtils.parseExceptionOccurred(e, mActivity);
-				}
-				mActivity.setRefreshActionButtonState(false);
-			}
-		});
-		ParseQuery query = new ParseQuery(ParseUtils.TABLE_MONTH);
-
-		query.whereEqualTo(ParseUtils.COLUMN_YEAR_ID, yearObject.getObjectId());
-		query.whereEqualTo(ParseUtils.COLUMN_USER_ID,
-				StorageUtils.getUserId(mActivity));
-		query.findInBackground(new FindCallback() {
-
-			@Override
-			public void done(List<ParseObject> items, ParseException e) {
-				if (e == null) {
-
-				} else {
-					ParseUtils.parseExceptionOccurred(e, mActivity);
-				}
-			}
-		});
+		relation.getQuery().orderByAscending(ParseUtils.COLUMN_MONTH_ID)
+				.findInBackground(new FindCallback() {
+					@Override
+					public void done(List<ParseObject> items, ParseException e) {
+						if (e == null) {
+							mAdapter.setItems(items);
+						} else {
+							ParseUtils.parseExceptionOccurred(e, mActivity);
+						}
+						mActivity.setRefreshActionButtonState(false);
+					}
+				});
 	}
 
 	@Override
@@ -188,6 +173,7 @@ public class MonthFragment extends BaseFragment {
 								relation.add(newMonth);
 								// TODO - Add callback
 								yearObject.saveInBackground();
+								mAdapter.addItem(newMonth);
 							} else {
 								ParseUtils.parseExceptionOccurred(e, mActivity);
 							}
